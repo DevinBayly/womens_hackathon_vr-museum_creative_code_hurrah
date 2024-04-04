@@ -3,6 +3,7 @@
 <head>
     <!-- this imports the aframe package that we use for web vr -->
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.9.2/lib/p5.js"></script>
 </head>
 
 <body>
@@ -40,46 +41,17 @@
             schema: { default: '' },
 
             init: function () {
-                this.canvas = document.getElementById(this.data);
-                this.context = this.canvas.getContext('2d');
+                let updater = ()=> {
 
-                this.x = 200;
-                this.y = 100;
-                this.dx = 3;
-                this.dy = 3;
-                // let updater = ()=> {
-
-                //     if (this.el.object3D.material) {
-                //     console.log(this.el)
-                //     this.el.object3D.material.map.needsUpdate=true
-
-                //     } else {
-                //         console.log("no material yet")
-                //         setTimeout(updater,1000)
-                //     }
-                // }
-                // updater.bind(this)
-                // setTimeout(updater,5000)
-
-
-                // Draw on canvas...
-                this.x += this.dx;
-                this.y += this.dy;
-
-                if (this.x > 512 - 50 || this.x < 0)
-                    this.dx *= -1;
-                if (this.y > 512 - 50 || this.y < 0)
-                    this.dy *= -1;
-
-                // clear canvas
-                this.context.fillStyle = "#8888FF";
-                this.context.fillRect(0, 0, 512, 512);
-
-                // draw rectangle
-                this.context.fillStyle = "#FF0000";
-                this.context.fillRect(this.x, this.y, 50, 50);
+                    this.canvas = document.getElementById("defaultCanvas0");
+                    if (this.canvas) {
+                        console.log("yes found canvas",canvas)
+                    }
+                }
+                updater.bind(this)
+                setTimeout(updater,5000)
             },
-            // tick: function () {
+            tick: function () {
 
             //     // thanks to https://github.com/aframevr/aframe/issues/3936 for the update fix
             //     let material = this.el.getObject3D('mesh').material;
@@ -87,8 +59,20 @@
             //         return;
             //     else
             //         material.map.needsUpdate = true;
-            // }
+            }
         });
+    </script>
+    <script>
+function setup() {
+    let aframecan = document.querySelector("#my-canvas")
+    console.log(aframecan)
+	createCanvas(windowWidth, windowHeight,aframecan);
+	background("red");
+}
+
+function draw() {
+	circle(mouseX, mouseY, 20);
+}
     </script>
     <a-scene loading-screen="dotsColor: black; backgroundColor: white" cursor="rayOrigin: mouse">
         <a-assets>
@@ -99,7 +83,7 @@
         <a-entity gltf-model="#museum" material="side:double;shader:flat"></a-entity>
         <a-entity anchor-reader="anchorName:piece1" gltf-model="#anchors">
             <a-entity width = "6" height="5" geometry="primitive: plane" material="src: #my-canvas;shader:flat;side:double"
-                draw-canvas="my-canvas"></a-entity>
+                draw-canvas="defaultCanvas0"></a-entity>
         </a-entity>
     </a-scene>
 
