@@ -54,11 +54,11 @@
             tick: function () {
 
             //     // thanks to https://github.com/aframevr/aframe/issues/3936 for the update fix
-            //     let material = this.el.getObject3D('mesh').material;
-            //     if (!material.map)
-            //         return;
-            //     else
-            //         material.map.needsUpdate = true;
+                let material = this.el.getObject3D('mesh').material;
+                if (!material.map)
+                    return;
+                else
+                    material.map.needsUpdate = true;
             }
         });
     </script>
