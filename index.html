@@ -1,0 +1,108 @@
+<html>
+
+<head>
+    <!-- this imports the aframe package that we use for web vr -->
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+</head>
+
+<body>
+    <script>
+        AFRAME.registerComponent("anchor-reader", {
+            schema: {
+                // accept our input as the name of the empty from the blender file that we used to more intuitively position the info and movement icons
+                anchorName: { type: "string" },
+            },
+            init: function () {
+                // this is the function that we will use to update the location of the child
+                var match_name = function () {
+                    var mesh = this.el.getObject3D("mesh") // might need to specify the name actually
+                    console.log("this mesh is the one we loaded", mesh)
+                    // can search the children for a name matching anchorName
+                    // then get the circle within the entity and set the rotation and translation on that
+                    let infoCircle = this.el.children[0]
+                    for (let anchor of mesh.children) {
+                        if (anchor.name == this.data.anchorName) {
+                            // unfortunate change of how values are handled between blender's zup and threejs y up
+                            // because we switched systems we have to invert the x, and then change which is z vs y, and then make the rotation use y instead of z, the same kinds of inversions are probably used if needing to handle other kinds of rotation, but for eye level info buttons this should be enough
+                            infoCircle.object3D.position.copy(anchor.position)
+                            infoCircle.object3D.rotation.copy(anchor.rotation)
+
+                        }
+                    }
+
+                }
+                match_name = match_name.bind(this)
+                // here we iterate over the model if it's finished loading and then introduce
+                this.el.addEventListener("model-loaded", match_name)
+            },
+        });
+        AFRAME.registerComponent('draw-canvas', {
+            schema: { default: '' },
+
+            init: function () {
+                this.canvas = document.getElementById(this.data);
+                this.context = this.canvas.getContext('2d');
+
+                this.x = 200;
+                this.y = 100;
+                this.dx = 3;
+                this.dy = 3;
+                // let updater = ()=> {
+
+                //     if (this.el.object3D.material) {
+                //     console.log(this.el)
+                //     this.el.object3D.material.map.needsUpdate=true
+
+                //     } else {
+                //         console.log("no material yet")
+                //         setTimeout(updater,1000)
+                //     }
+                // }
+                // updater.bind(this)
+                // setTimeout(updater,5000)
+
+
+                // Draw on canvas...
+                this.x += this.dx;
+                this.y += this.dy;
+
+                if (this.x > 512 - 50 || this.x < 0)
+                    this.dx *= -1;
+                if (this.y > 512 - 50 || this.y < 0)
+                    this.dy *= -1;
+
+                // clear canvas
+                this.context.fillStyle = "#8888FF";
+                this.context.fillRect(0, 0, 512, 512);
+
+                // draw rectangle
+                this.context.fillStyle = "#FF0000";
+                this.context.fillRect(this.x, this.y, 50, 50);
+            },
+            // tick: function () {
+
+            //     // thanks to https://github.com/aframevr/aframe/issues/3936 for the update fix
+            //     let material = this.el.getObject3D('mesh').material;
+            //     if (!material.map)
+            //         return;
+            //     else
+            //         material.map.needsUpdate = true;
+            // }
+        });
+    </script>
+    <a-scene loading-screen="dotsColor: black; backgroundColor: white" cursor="rayOrigin: mouse">
+        <a-assets>
+            <canvas id="my-canvas" crossorigin="anonymous" width="512" height="512"></canvas>
+            <a-asset-item id="museum" src="museum.glb"></a-asset-item>
+            <a-asset-item id="anchors" src="anchors.glb"></a-asset-item>
+        </a-assets>
+        <a-entity gltf-model="#museum" material="side:double;shader:flat"></a-entity>
+        <a-entity anchor-reader="anchorName:piece1" gltf-model="#anchors">
+            <a-entity width = "6" height="5" geometry="primitive: plane" material="src: #my-canvas;shader:flat;side:double"
+                draw-canvas="my-canvas"></a-entity>
+        </a-entity>
+    </a-scene>
+
+</body>
+
+</html>
