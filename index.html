@@ -7,7 +7,11 @@
 </head>
 
 <body>
+    
     <script>
+        function runSketch(code)  {
+            eval(code)
+        }
 
         AFRAME.registerComponent("anchor-reader", {
             schema: {
@@ -97,14 +101,18 @@
                 this.el.addEventListener("click", function () {
                     // create a canvas, run the code, and replace the shader src with the canvas
                     //TODO decide what happens when a different sketch is activated, do we see the other one shut off?
-                    let canvas = document.querySelector("#my-canvas")
-                    let script = document.querySelector("#code")
                     // go get the code
                     fetch(`https://openprocessing.org/api/sketch/${vid}/code`).then(res => res.json()).then(codej => {
-                       script.onload = ()=> {
-                        console.log("starting the p5 script")
+                       // clone the canvas
+                       // do some light checking that the code is a sketch
+                       let code = codej[0].code
+                       if (!/setup/.test(code) || !/draw/.test(code)){
+                         console.log("source code not p5",code)
+                         return
                        }
-                       script.text = codej[0].code 
+                       // will be using eval so note that this should just be used at the event and not further and preferably just on the display machine not the personal machiens
+                       // later on we will be able to just commit the examples to the actual repo and it will be much easier to work with 
+                       runSketch(code)
                     })
 
 
@@ -145,9 +153,6 @@
                 })
             }
         })
-    </script>
-    <script id="code"></script>
-    <script>
     </script>
     <a-scene kickoff id="#scene" loading-screen="dotsColor: black; backgroundColor: white" cursor="rayOrigin: mouse">
         <a-assets>
