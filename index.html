@@ -7,10 +7,11 @@
 </head>
 
 <body>
-    
     <script>
         function runSketch(code)  {
             eval(code)
+            setup()
+            draw()
         }
 
         AFRAME.registerComponent("anchor-reader", {
@@ -102,18 +103,7 @@
                     // create a canvas, run the code, and replace the shader src with the canvas
                     //TODO decide what happens when a different sketch is activated, do we see the other one shut off?
                     // go get the code
-                    fetch(`https://openprocessing.org/api/sketch/${vid}/code`).then(res => res.json()).then(codej => {
-                       // clone the canvas
-                       // do some light checking that the code is a sketch
-                       let code = codej[0].code
-                       if (!/setup/.test(code) || !/draw/.test(code)){
-                         console.log("source code not p5",code)
-                         return
-                       }
-                       // will be using eval so note that this should just be used at the event and not further and preferably just on the display machine not the personal machiens
-                       // later on we will be able to just commit the examples to the actual repo and it will be much easier to work with 
-                       runSketch(code)
-                    })
+                    window.location.href = `https://openprocessing.org/sketch/${vid}`
 
 
                 });
@@ -160,8 +150,27 @@
             <canvas id="my-canvas" crossorigin="anonymous" width="512" height="512"></canvas>
             <a-asset-item id="museum" src="museum.glb"></a-asset-item>
             <a-asset-item id="anchors" src="anchors.glb"></a-asset-item>
+            <a-asset-item id="lights" src="lights.glb"></a-asset-item>
+            <img src="360.jpeg" id="360"/>
         </a-assets>
-        <a-entity gltf-model="#museum" material="side:double;shader:flat"></a-entity>
+        <a-entity gltf-model="#museum" material="side:double;"></a-entity>
+        <a-entity anchor-reader="anchorName:light" gltf-model="#lights">
+            <a-entity light=" intensity: .5" position="0 0 0"></a-entity>
+        </a-entity>
+        <a-entity anchor-reader="anchorName:light1" gltf-model="#lights">
+            <a-entity light=" intensity: .5" position="0 0 0"></a-entity>
+        </a-entity>
+        <a-entity anchor-reader="anchorName:light2" gltf-model="#lights">
+            <a-entity light=" intensity: .5" position="0 0 0"></a-entity>
+        </a-entity>
+        <a-entity anchor-reader="anchorName:light3" gltf-model="#lights">
+            <a-entity light=" intensity: .5" position="0 0 0"></a-entity>
+        </a-entity>
+        <a-entity anchor-reader="anchorName:light4" gltf-model="#lights">
+            <a-entity light=" intensity: .5" position="0 0 0" rotation="180 0 0"></a-entity>
+        </a-entity>
+        <a-sky src="#360" ></a-sky>
+        <!-- <a-sky color="#6EBAA7"></a-sky> -->
     </a-scene>
 
 </body>
