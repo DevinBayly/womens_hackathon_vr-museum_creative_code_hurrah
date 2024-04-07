@@ -8,7 +8,7 @@
 
 <body>
     <script>
-        function runSketch(code)  {
+        function runSketch(code) {
             eval(code)
             setup()
             draw()
@@ -119,26 +119,29 @@
                     let scene = this.el
                     // iterate over indices of the anchors
                     let i = 0
-                    for (let sketch of j) {
-                        // get the sketch id
-                        let vid = sketch.visualID
-                        let thumbURLHash = sketch.thumbnailUpdatedOn.replace(/\D/g, "")
-                        let thumbURL = `https://openprocessing-usercontent.s3.amazonaws.com/thumbnails/visualThumbnail${vid}@2x.jpg?hash=${thumbURLHash}`
-                        let anchorreader = document.createElement("a-entity")
-                        let childgeometry = document.createElement("a-entity")
-                        anchorreader.append(childgeometry)
-                        scene.append(anchorreader)
-                        let iPad = i.toString().padStart(3,"0")
-                        anchorreader.setAttribute("anchor-reader", `anchorName:piece${iPad}`)
-                        anchorreader.setAttribute("gltf-model", "#anchors")
-                        // increment i
-                        i += 1
-                        childgeometry.setAttribute("geometry", "primitive:plane")
-                        // j is usually a list in case there's more than a single file, for our sake though we assume that single files are being used
-                        childgeometry.setAttribute("sketchlistener", `vid:${vid};thumburl:${thumbURL}`)
+                    for (let redo = 0; redo < 15; redo++) {
+
+                        for (let sketch of j) {
+                            // get the sketch id
+                            let vid = sketch.visualID
+                            let thumbURLHash = sketch.thumbnailUpdatedOn.replace(/\D/g, "")
+                            let thumbURL = `https://openprocessing-usercontent.s3.amazonaws.com/thumbnails/visualThumbnail${vid}@2x.jpg?hash=${thumbURLHash}`
+                            let anchorreader = document.createElement("a-entity")
+                            let childgeometry = document.createElement("a-entity")
+                            anchorreader.append(childgeometry)
+                            scene.append(anchorreader)
+                            let iPad = i.toString().padStart(3, "0")
+                            anchorreader.setAttribute("anchor-reader", `anchorName:piece${iPad}`)
+                            anchorreader.setAttribute("gltf-model", "#anchors")
+                            // increment i
+                            i += 1
+                            childgeometry.setAttribute("geometry", "primitive:plane")
+                            // j is usually a list in case there's more than a single file, for our sake though we assume that single files are being used
+                            childgeometry.setAttribute("sketchlistener", `vid:${vid};thumburl:${thumbURL}`)
 
 
 
+                        }
                     }
 
                 })
@@ -151,10 +154,27 @@
             <canvas id="my-canvas" crossorigin="anonymous" width="512" height="512"></canvas>
             <a-asset-item id="museum" src="museum.glb"></a-asset-item>
             <a-asset-item id="anchors" src="anchors.glb"></a-asset-item>
+            <a-asset-item id="maggies" src="maggies.glb"></a-asset-item>
             <a-asset-item id="lights" src="lights.glb"></a-asset-item>
-            <img src="360.jpeg" id="360"/>
+            <img src="m1.png" id="m1" />
+            <img src="m2.png" id="m2" />
+            <img src="m3.png" id="m3" />
+            <img src="m4.png" id="m4" />
+            <img src="360.jpeg" id="360" />
         </a-assets>
         <a-entity gltf-model="#museum" material="side:double;"></a-entity>
+        <a-entity anchor-reader="anchorName:maggie000" gltf-model="#maggies">
+            <a-plane scale="1.5 1.5 1.5" material="src:#m1;sided:double"></a-plane>
+        </a-entity>
+        <a-entity anchor-reader="anchorName:maggie001" gltf-model="#maggies">
+            <a-plane scale="1.5 1.5 1.5" material="src:#m2;sided:double"></a-plane>
+        </a-entity>
+        <a-entity anchor-reader="anchorname:maggie002" gltf-model="#maggies">
+            <a-plane scale="1.5 1.5 1.5" material="src:#m3;sided:double"></a-plane>
+        </a-entity>
+        <a-entity anchor-reader="anchorName:maggie003" gltf-model="#maggies">
+            <a-plane scale="1.5 1.5 1.5" material="src:#m4;sided:double"></a-plane>
+        </a-entity>
         <a-entity anchor-reader="anchorName:light" gltf-model="#lights">
             <a-entity light=" intensity: .5" position="0 0 0"></a-entity>
         </a-entity>
@@ -170,7 +190,7 @@
         <a-entity anchor-reader="anchorName:light4" gltf-model="#lights">
             <a-entity light=" intensity: .5" position="0 0 0" rotation="180 0 0"></a-entity>
         </a-entity>
-        <a-sky src="#360" ></a-sky>
+        <a-sky src="#360"></a-sky>
         <!-- <a-sky color="#6EBAA7"></a-sky> -->
     </a-scene>
 
