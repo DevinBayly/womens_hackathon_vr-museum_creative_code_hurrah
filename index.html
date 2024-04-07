@@ -128,7 +128,8 @@
                         let childgeometry = document.createElement("a-entity")
                         anchorreader.append(childgeometry)
                         scene.append(anchorreader)
-                        anchorreader.setAttribute("anchor-reader", `anchorName:piece${i}`)
+                        let iPad = i.toString().padStart(3,"0")
+                        anchorreader.setAttribute("anchor-reader", `anchorName:piece${iPad}`)
                         anchorreader.setAttribute("gltf-model", "#anchors")
                         // increment i
                         i += 1
