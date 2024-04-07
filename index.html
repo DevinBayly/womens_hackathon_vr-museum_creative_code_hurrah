@@ -87,6 +87,28 @@
                 // callbacks setup to handle behavior from different mousing interactions
                 let thumburl = this.data.thumburl
                 let vid = this.data.vid
+                fetch(`https://openprocessing.org/api/sketch/${vid}`).then(res=>res.json()).then(json=>{
+                    // add text underneath that shows the title of the sketch
+                    console.log(json)
+                    // add in a-text so that the parents position and rotation is inherited
+                    let text = document.createElement("a-entity")
+                    text.setAttribute("text",`align:center;value:${json.title};color:black`)
+                    text.setAttribute("position","0 -.7 0")
+                    text.setAttribute("scale","3 3 3")
+                    let description = document.createElement("a-entity")
+                    description.setAttribute("text",`align:center;value:${json.description};color:black`)
+                    description.setAttribute("position","0 -.9 0")
+                    el.append(description)
+                    el.append(text)
+                    this.el.addEventListener("click", function () {
+                    // create a canvas, run the code, and replace the shader src with the canvas
+                    //TODO decide what happens when a different sketch is activated, do we see the other one shut off?
+                    // go get the code
+                    window.location.href = `https://openprocessing.org/sketch/${vid}`
+
+
+                });
+                }) 
 
 
                 el.setAttribute("material", `shader:flat;src:${thumburl}`)
@@ -101,14 +123,7 @@
                 });
                 // this is if the html file was what was put in
                 //
-                this.el.addEventListener("click", function () {
-                    // create a canvas, run the code, and replace the shader src with the canvas
-                    //TODO decide what happens when a different sketch is activated, do we see the other one shut off?
-                    // go get the code
-                    window.location.href = `https://openprocessing.org/sketch/${vid}`
-
-
-                });
+                
             },
         });
         AFRAME.registerComponent("kickoff", {
@@ -137,7 +152,8 @@
                             anchorreader.setAttribute("gltf-model", "#anchors")
                             // increment i
                             i += 1
-                            childgeometry.setAttribute("geometry", "primitive:plane")
+                            childgeometry.setAttribute("geometry", `primitive:plane;width:${16/9};height:1`)
+
                             // j is usually a list in case there's more than a single file, for our sake though we assume that single files are being used
                             childgeometry.setAttribute("sketchlistener", `vid:${vid};thumburl:${thumbURL}`)
 
