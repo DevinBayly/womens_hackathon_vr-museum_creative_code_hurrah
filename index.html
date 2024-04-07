@@ -8,6 +8,7 @@
 
 <body>
     <script>
+
         AFRAME.registerComponent("anchor-reader", {
             schema: {
                 // accept our input as the name of the empty from the blender file that we used to more intuitively position the info and movement icons
@@ -30,7 +31,6 @@
 
                         }
                     }
-
                 }
                 match_name = match_name.bind(this)
                 // here we iterate over the model if it's finished loading and then introduce
@@ -61,41 +61,90 @@
                     material.map.needsUpdate = true;
             }
         });
-    </script>
-    <script>
-        fetch("https://openprocessing.org/api/curation/87642/sketches?limit=10&offset=0").then(res => res.json()).then(j => {
-            console.log(j)
-            let thumbURLHash = j[0].thumbnailUpdatedOn.replace(/\D/g, "")
-            console.log(thumbURLHash)
-            let vid = j[0].visualID
-            let thumbURL = `https://openprocessing-usercontent.s3.amazonaws.com/thumbnails/visualThumbnail${vid}@2x.jpg?hash=${thumbURLHash}`
+        AFRAME.registerComponent("sketchlistener", {
+            schema: {
+                vid: { type: "int" },
+                thumburl: { type: "string" },
+                code: { type: "string" }
 
-            let holder = document.querySelector("#holder")
-            console.log(holder)
-            holder.setAttribute("material", `shader:flat;src:${thumbURL}`)
-            for (let sketch of j) {
-                // get the sketch id
-                let id = sketch.visualID
-                // fetch code
-                fetch(`https://openprocessing.org/api/sketch/${id}/code`).then(res => res.json()).then(j => {
-                    console.log(id, j)
+            },
+            init: function () {
+                // simplify reference to the entity in code
+                let el = this.el;
+                // the input provided by the component defined on the entity
+                // callbacks setup to handle behavior from different mousing interactions
+                let thumburl = el.data.thumburl
+                let vid = el.data.vid
+                let code = el.data.code
+
+
+                el.setAttribute("material", `shader:flat;src:${thumburl}`)
+                this.el.addEventListener("mouseenter", function (e) {
+                    // play with emissivity
+                    el.setAttribute("material", "color", "#5ef7ff");
+                    //el.setAttribute("material","emissiveIntensity","1")
+                });
+                this.el.addEventListener("mouseleave", function () {
+                    //el.setAttribute("material", "emissiveIntensity",'.2')
+                    el.setAttribute("material", "color", "white");
+                });
+                // this is if the html file was what was put in
+                //
+                this.el.addEventListener("click", function () {
+                    // create a canvas, run the code, and replace the shader src with the canvas
+                    //TODO decide what happens when a different sketch is activated, do we see the other one shut off?
+                    let canvas = document.querySelect("#my-canvas")
+                    let script = document.querySelector("#code")
+                    let
+
+
+
+                });
+            },
+        });
+        AFRAME.registerComponent("kickoff", {
+            init: function () {
+                let el = this.el
+
+                fetch("https://openprocessing.org/api/curation/87642/sketches?limit=10&offset=0").then(res => res.json()).then(j => {
+
+
+                    let og = document.querySelector("#template")
+                    let scene = document.querySelector("#scene")
+                    for (let sketch of j) {
+                        // get the sketch id
+                        let vid = sketch.visualID
+                        let thumbURLHash = sketch.thumbnailUpdatedOn.replace(/\D/g, "")
+                        let thumbURL = `https://openprocessing-usercontent.s3.amazonaws.com/thumbnails/visualThumbnail${vid}@2x.jpg?hash=${thumbURLHash}`
+                        // fetch code
+                        fetch(`https://openprocessing.org/api/sketch/${vid}/code`).then(res => res.json()).then(j => {
+                            let dup = og.cloneNode()
+                            scene.append(dup)
+                            let child = dup.querySelector("#sketchholder")
+                            child.setAttribute("sketchlistener", `vid:${vid};thumburl:${thumbURL};code:${j.code}`)
+                        })
+                        // clone the template node
+                        // update the anchor name and then add a component to the child that has a new sketch element on it
+
+
+
+                    }
+
                 })
             }
-
         })
     </script>
-    <a-scene loading-screen="dotsColor: black; backgroundColor: white" cursor="rayOrigin: mouse">
+    <script id="code"></script>
+    <script>
+    </script>
+    <a-scene kickoff id="#scene" loading-screen="dotsColor: black; backgroundColor: white" cursor="rayOrigin: mouse">
         <a-assets>
+            <!-- TODO change default size of the canvas -->
             <canvas id="my-canvas" crossorigin="anonymous" width="512" height="512"></canvas>
             <a-asset-item id="museum" src="museum.glb"></a-asset-item>
             <a-asset-item id="anchors" src="anchors.glb"></a-asset-item>
         </a-assets>
         <a-entity gltf-model="#museum" material="side:double;shader:flat"></a-entity>
-        <a-entity anchor-reader="anchorName:piece1" gltf-model="#anchors">
-            <!-- </a-entity id="holder" geometry="primitive:plane" width="5" height="6"></a-entity> -->
-            <a-entity id="holder" width="6" height="5" geometry="primitive: plane"
-                ></a-entity>
-        </a-entity>
     </a-scene>
 
 </body>
