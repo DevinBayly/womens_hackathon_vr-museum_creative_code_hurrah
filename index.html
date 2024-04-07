@@ -133,7 +133,7 @@
                 let params = new URLSearchParams(location.search);
                 console.log("params are",params)
                 let curation = params.get("curation")
-                fetch(`https://openprocessing.org/api/curation/${curation}/sketches?limit=10&offset=0`).then(res => res.json()).then(j => {
+                fetch(`https://openprocessing.org/api/curation/${curation}/sketches`).then(res => res.json()).then(j => {
 
 
                     let scene = this.el
