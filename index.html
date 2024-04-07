@@ -101,8 +101,10 @@
                     let script = document.querySelector("#code")
                     // go get the code
                     fetch(`https://openprocessing.org/api/sketch/${vid}/code`).then(res => res.json()).then(codej => {
-                        // make the two things, the holder that has the anchoreader and the models,
-                        // also the entity within that is a geometry that's moved
+                       script.onload = ()=> {
+                        console.log("starting the p5 script")
+                       }
+                       script.text = codej[0].code 
                     })
 
 
