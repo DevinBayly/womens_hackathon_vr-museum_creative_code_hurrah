@@ -22,14 +22,20 @@
                     // can search the children for a name matching anchorName
                     // then get the circle within the entity and set the rotation and translation on that
                     let infoCircle = this.el.children[0]
+                    let success = false
                     for (let anchor of mesh.children) {
                         if (anchor.name == this.data.anchorName) {
                             // unfortunate change of how values are handled between blender's zup and threejs y up
                             // because we switched systems we have to invert the x, and then change which is z vs y, and then make the rotation use y instead of z, the same kinds of inversions are probably used if needing to handle other kinds of rotation, but for eye level info buttons this should be enough
                             infoCircle.object3D.position.copy(anchor.position)
                             infoCircle.object3D.rotation.copy(anchor.rotation)
-
+                            success = true
                         }
+                    }
+                    if (! success) {
+                        // should probably delete, not enough empties for number of sketches
+                        console.log("no match for ",this.data.anchorName)
+                        this.el.remove()
                     }
                 }
                 match_name = match_name.bind(this)
@@ -73,9 +79,9 @@
                 let el = this.el;
                 // the input provided by the component defined on the entity
                 // callbacks setup to handle behavior from different mousing interactions
-                let thumburl = el.data.thumburl
-                let vid = el.data.vid
-                let code = el.data.code
+                let thumburl = this.data.thumburl
+                let vid = this.data.vid
+                let code = this.data.code
 
 
                 el.setAttribute("material", `shader:flat;src:${thumburl}`)
@@ -109,8 +115,9 @@
                 fetch("https://openprocessing.org/api/curation/87642/sketches?limit=10&offset=0").then(res => res.json()).then(j => {
 
 
-                    let og = document.querySelector("#template")
-                    let scene = document.querySelector("#scene")
+                    let scene = this.el
+                    // iterate over indices of the anchors
+                    let i =0
                     for (let sketch of j) {
                         // get the sketch id
                         let vid = sketch.visualID
@@ -118,10 +125,20 @@
                         let thumbURL = `https://openprocessing-usercontent.s3.amazonaws.com/thumbnails/visualThumbnail${vid}@2x.jpg?hash=${thumbURLHash}`
                         // fetch code
                         fetch(`https://openprocessing.org/api/sketch/${vid}/code`).then(res => res.json()).then(j => {
-                            let dup = og.cloneNode()
-                            scene.append(dup)
-                            let child = dup.querySelector("#sketchholder")
-                            child.setAttribute("sketchlistener", `vid:${vid};thumburl:${thumbURL};code:${j.code}`)
+                            // make the two things, the holder that has the anchoreader and the models,
+                            // also the entity within that is a geometry that's moved
+                            let anchorreader = document.createElement("a-entity")
+                            let childgeometry = document.createElement("a-entity")
+                            anchorreader.append(childgeometry)
+                            scene.append(anchorreader)
+                            anchorreader.setAttribute("anchor-reader",`anchorName:piece${i}`)
+                            anchorreader.setAttribute("gltf-model","#anchors")
+                            // increment i
+                            i+=1
+
+                            childgeometry.setAttribute("geometry","primitive:plane")
+
+                            childgeometry.setAttribute("sketchlistener", `vid:${vid};thumburl:${thumbURL};code:${j.code}`)
                         })
                         // clone the template node
                         // update the anchor name and then add a component to the child that has a new sketch element on it
