@@ -24,6 +24,7 @@
                     let infoCircle = this.el.children[0]
                     let success = false
                     for (let anchor of mesh.children) {
+                        console.log(anchor.name)
                         if (anchor.name == this.data.anchorName) {
                             // unfortunate change of how values are handled between blender's zup and threejs y up
                             // because we switched systems we have to invert the x, and then change which is z vs y, and then make the rotation use y instead of z, the same kinds of inversions are probably used if needing to handle other kinds of rotation, but for eye level info buttons this should be enough
@@ -32,9 +33,9 @@
                             success = true
                         }
                     }
-                    if (! success) {
+                    if (!success) {
                         // should probably delete, not enough empties for number of sketches
-                        console.log("no match for ",this.data.anchorName)
+                        console.log("no match for ", this.data.anchorName)
                         this.el.remove()
                     }
                 }
@@ -71,8 +72,6 @@
             schema: {
                 vid: { type: "int" },
                 thumburl: { type: "string" },
-                code: { type: "string" }
-
             },
             init: function () {
                 // simplify reference to the entity in code
@@ -81,7 +80,6 @@
                 // callbacks setup to handle behavior from different mousing interactions
                 let thumburl = this.data.thumburl
                 let vid = this.data.vid
-                let code = this.data.code
 
 
                 el.setAttribute("material", `shader:flat;src:${thumburl}`)
@@ -99,10 +97,13 @@
                 this.el.addEventListener("click", function () {
                     // create a canvas, run the code, and replace the shader src with the canvas
                     //TODO decide what happens when a different sketch is activated, do we see the other one shut off?
-                    let canvas = document.querySelect("#my-canvas")
+                    let canvas = document.querySelector("#my-canvas")
                     let script = document.querySelector("#code")
-                    let
-
+                    // go get the code
+                    fetch(`https://openprocessing.org/api/sketch/${vid}/code`).then(res => res.json()).then(codej => {
+                        // make the two things, the holder that has the anchoreader and the models,
+                        // also the entity within that is a geometry that's moved
+                    })
 
 
                 });
@@ -117,31 +118,23 @@
 
                     let scene = this.el
                     // iterate over indices of the anchors
-                    let i =0
+                    let i = 0
                     for (let sketch of j) {
                         // get the sketch id
                         let vid = sketch.visualID
                         let thumbURLHash = sketch.thumbnailUpdatedOn.replace(/\D/g, "")
                         let thumbURL = `https://openprocessing-usercontent.s3.amazonaws.com/thumbnails/visualThumbnail${vid}@2x.jpg?hash=${thumbURLHash}`
-                        // fetch code
-                        fetch(`https://openprocessing.org/api/sketch/${vid}/code`).then(res => res.json()).then(j => {
-                            // make the two things, the holder that has the anchoreader and the models,
-                            // also the entity within that is a geometry that's moved
-                            let anchorreader = document.createElement("a-entity")
-                            let childgeometry = document.createElement("a-entity")
-                            anchorreader.append(childgeometry)
-                            scene.append(anchorreader)
-                            anchorreader.setAttribute("anchor-reader",`anchorName:piece${i}`)
-                            anchorreader.setAttribute("gltf-model","#anchors")
-                            // increment i
-                            i+=1
-
-                            childgeometry.setAttribute("geometry","primitive:plane")
-
-                            childgeometry.setAttribute("sketchlistener", `vid:${vid};thumburl:${thumbURL};code:${j.code}`)
-                        })
-                        // clone the template node
-                        // update the anchor name and then add a component to the child that has a new sketch element on it
+                        let anchorreader = document.createElement("a-entity")
+                        let childgeometry = document.createElement("a-entity")
+                        anchorreader.append(childgeometry)
+                        scene.append(anchorreader)
+                        anchorreader.setAttribute("anchor-reader", `anchorName:piece${i}`)
+                        anchorreader.setAttribute("gltf-model", "#anchors")
+                        // increment i
+                        i += 1
+                        childgeometry.setAttribute("geometry", "primitive:plane")
+                        // j is usually a list in case there's more than a single file, for our sake though we assume that single files are being used
+                        childgeometry.setAttribute("sketchlistener", `vid:${vid};thumburl:${thumbURL}`)
 
 
 
