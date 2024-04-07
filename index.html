@@ -29,7 +29,6 @@
                     let infoCircle = this.el.children[0]
                     let success = false
                     for (let anchor of mesh.children) {
-                        console.log(anchor.name)
                         if (anchor.name == this.data.anchorName) {
                             // unfortunate change of how values are handled between blender's zup and threejs y up
                             // because we switched systems we have to invert the x, and then change which is z vs y, and then make the rotation use y instead of z, the same kinds of inversions are probably used if needing to handle other kinds of rotation, but for eye level info buttons this should be enough
@@ -40,6 +39,9 @@
                     }
                     if (!success) {
                         // should probably delete, not enough empties for number of sketches
+                        if (this.data.anchorName=="") {
+                            console.log("nreak now")
+                        }
                         console.log("no match for ", this.data.anchorName)
                         this.el.remove()
                     }
@@ -169,10 +171,10 @@
         <a-entity anchor-reader="anchorName:maggie001" gltf-model="#maggies">
             <a-plane scale="1.5 1.5 1.5" material="src:#m2;sided:double"></a-plane>
         </a-entity>
-        <a-entity anchor-reader="anchorname:maggie002" gltf-model="#maggies">
+        <a-entity anchor-reader="anchorName:maggie003" gltf-model="#maggies">
             <a-plane scale="1.5 1.5 1.5" material="src:#m3;sided:double"></a-plane>
         </a-entity>
-        <a-entity anchor-reader="anchorName:maggie003" gltf-model="#maggies">
+        <a-entity anchor-reader="anchorName:maggie002" gltf-model="#maggies">
             <a-plane scale="1.5 1.5 1.5" material="src:#m4;sided:double"></a-plane>
         </a-entity>
         <a-entity anchor-reader="anchorName:light" gltf-model="#lights">
