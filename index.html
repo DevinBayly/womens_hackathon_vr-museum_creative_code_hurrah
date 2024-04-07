@@ -129,14 +129,16 @@
         AFRAME.registerComponent("kickoff", {
             init: function () {
                 let el = this.el
-
-                fetch("https://openprocessing.org/api/curation/87642/sketches?limit=10&offset=0").then(res => res.json()).then(j => {
+                // get information from the url
+                let params = new URLSearchParams(location.search);
+                console.log("params are",params)
+                let curation = params.get("curation")
+                fetch(`https://openprocessing.org/api/curation/${curation}/sketches?limit=10&offset=0`).then(res => res.json()).then(j => {
 
 
                     let scene = this.el
                     // iterate over indices of the anchors
                     let i = 0
-                    for (let redo = 0; redo < 15; redo++) {
 
                         for (let sketch of j) {
                             // get the sketch id
@@ -160,7 +162,6 @@
 
 
                         }
-                    }
 
                 })
             }
@@ -187,7 +188,7 @@
         <a-entity anchor-reader="anchorName:maggie001" gltf-model="#maggies">
             <a-plane scale="1.5 1.5 1.5" material="src:#m2;sided:double"></a-plane>
         </a-entity>
-        <a-entity anchor-reader="anchorName:maggie003" gltf-model="#maggies">
+        <a-entity anchor-reader="anchoame:maggie003" gltf-model="#maggies">
             <a-plane scale="1.5 1.5 1.5" material="src:#m3;sided:double"></a-plane>
         </a-entity>
         <a-entity anchor-reader="anchorName:maggie002" gltf-model="#maggies">
